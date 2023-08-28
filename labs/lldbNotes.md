@@ -16,6 +16,7 @@
 - - Diamonds mean that they can be expanded with right arrow when in the variables tab
 - - "n" key means next line in execution
 - - "s" key means step in
+- - "F5" to access the registers tab
 
 - Other Commands
 - - "bt" for backtrace
