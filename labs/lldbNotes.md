@@ -7,7 +7,7 @@
 - Compilation with LLDB: gcc -g <file_name>
 - Running the Programme with LLDB: lldb ./a.out
 - Enter: target create ./a.out
-- Enter: b mainc
+- Enter: b main
 - Enter: run
 - Enter: gui
 
