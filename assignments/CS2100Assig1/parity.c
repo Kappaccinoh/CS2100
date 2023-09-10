@@ -52,7 +52,7 @@ uint8_t hex2dec(char *byte) {
     // into decimal. Complete this function in a 
     // "return" statement. E.g. return bytes[1] + byte[2];
     // No credit if you use >1 line.
-    return 0;
+    return *byte;
 }
 
 // Converts a string of hexadecimal numbers into an array of 
@@ -64,6 +64,13 @@ uint8_t hex2dec(char *byte) {
 // You may want to look at the strtok function.
 
 void string2bytes(char *str, uint8_t *bytes, uint8_t *len) {
+    size_t length = strlen(str);
+    *len = length / 3;
+    for (int i = 0; i < length; i += 3) {
+        uint8_t msb = str[i];
+        uint8_t lsb = str[i + 1];
+        *bytes = finddec(msb) * 16 + finddec(lsb);
+    }
 }
 
 // Receives a string of bytes in hexadecimal, and returns the parity
@@ -71,5 +78,13 @@ void string2bytes(char *str, uint8_t *bytes, uint8_t *len) {
 // str = String of bytes in hexadecimal separated by spaces
 // E.g. "08 1C 4B 1E". Do not use the 0x prefix for the bytes.
 uint8_t calculateParity(char *str) {
-    return 0;
+    size_t len = strlen(str);
+    int counter = 0;
+    uint8_t res = 255;
+    for (int i = 0; i < len; i += 3) {
+        uint8_t msb = str[i];
+        uint8_t lsb = str[i + 1];
+        res = res ^ (finddec(msb) * 16 + finddec(lsb));
+    }
+    return res;
 }
