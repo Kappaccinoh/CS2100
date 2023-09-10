@@ -57,7 +57,7 @@ void test2(char *filename, uint16_t *entries, uint16_t *score) {
 
         // Read in the string
         fgets(buffer, BUF_LEN, fp);
-        fscanf(fp, "%c", &parity);
+        fscanf(fp, "%hhu\n", &parity);
 
         // Compute the parity
         uint8_t yourParity = calculateParity(buffer);
