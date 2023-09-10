@@ -7,7 +7,11 @@
 // Calculate and return the parity byte 
 // for an array of bytes, using ODD parity.
 uint8_t findParity(uint8_t *array, uint8_t len) {
-    return 0;
+    uint8_t parityByte = 255;
+    for (int i = 0; i < len; i++) {
+        parityByte = parityByte ^ array[i];
+    }
+    return parityByte;
 }
 
 // (Done for you). 
