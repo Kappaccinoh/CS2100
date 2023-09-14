@@ -1,3 +1,27 @@
+/* part a */
+int main() {
+    int t0 = 5;
+    int x = 0;
+
+    while (t0 >= x) {
+        ctr = ctr / 2;
+        x++;
+    }
+}
+
+/* part b */
+int main() {
+    int t0 = 5;
+    int x = t0 + 10;
+
+    do {
+        ctr = ctr / 2;
+        x += -1;
+    } 
+    while (x >= t0);
+}
+
+
 /* part c */
 int main() {
     // int ctr = $s1;
@@ -34,7 +58,6 @@ int main() {
 
 
 int main() {
-    // int *s5 = A[v];
     int *t1 = &B[ctr];
     int *t0 = &A[ctr];
 
