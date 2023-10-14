@@ -82,34 +82,14 @@ int32_t mux_i32(bool ctrl, int32_t in0, int32_t in1) {
 #ifndef ASSIGNMENT2_QUESTION1B
 
 void decode(uint32_t in, struct instr* insn) {
-    uint8_t opcode, rs, rt, rd, shamt, funct;
-    int16_t immed;
-    uint32_t address;
-
-    insn->opcode = opcode;
-
-    opcode = in >> (32 - 6);
-    rs = (in >> (32 - 11)) & 31;
-    rt = (in >> (32 - 16)) & 31;
-    rd = (in >> (32 - 21)) & 31;
-    shamt = (in >> (32 - 26)) & 31;
-    funct = in & 63;
-    immed = (in >> (32 - 16)) & 65535;
-    address = (in << 6) >> 6;
-
-    if (opcode == 0) { // If R Instruction Format
-        insn->rs = rs;
-        insn->rt = rt;
-        insn->rd = rd;
-        insn->shamt = shamt;
-        insn->funct = funct;
-    } else if (opcode == 2 || opcode == 3) { // J Instruction Format
-        insn->address = address;
-    } else { // I Instruction Format
-        insn->rs = rs;
-        insn->rt = rt;
-        insn->immed = immed;
-    }
+    insn->opcode = in >> (32 - 6);
+    insn->rs = (in >> (32 - 11)) & 31;
+    insn->rt = (in >> (32 - 16)) & 31;
+    insn->rd = (in >> (32 - 21)) & 31;
+    insn->shamt = (in >> (32 - 26)) & 31;
+    insn->funct = in & 63;
+    insn->immed = (in >> (32 - 16)) & 65535;
+    insn->address = (in << 6) >> 6;
 }
 
 #endif  // End of Assignment 2, Question 1b
