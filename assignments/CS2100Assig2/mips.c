@@ -122,11 +122,22 @@ void Control(uint8_t opcode, bool* _RegDst, bool* _ALUSrc, bool* _MemtoReg,
     if (opcode == 0) *_RegDst = 1;
     else *_RegDst = 0;
 
+    if (opcode == 0 || opcode == 35) *_RegWrite = 1;
+    else *_RegWrite = 0;
+
     if (opcode == 0 || opcode == 4) *_ALUSrc = 0;
     else *_ALUSrc = 1;
 
-    if (opcode == 35) *_MemRead = 1;
-    else *_MemRead = 0;
+    if (opcode == 35) {
+        *_MemRead = 1;
+        *_MemtoReg = 1;
+    } else {
+        *_MemRead = 0;
+        *_MemtoReg = 0;
+    }
+
+    if (opcode == 43) *_MemWrite = 1;
+    else *_MemWrite = 0;
 
     switch (opcode) {
         case 0: *_ALUOp = 2;
@@ -141,9 +152,8 @@ void Control(uint8_t opcode, bool* _RegDst, bool* _ALUSrc, bool* _MemtoReg,
         default:
     }
 
-    if (opcode == 2 || opcode == 3) {
-        *_Branch = 1;
-    }
+    if (opcode == 4) *_Branch = 1;
+    else *_Branch = 0;
 }
 
 #endif  // End of Assignment 2, Question 2a
@@ -186,7 +196,7 @@ int32_t ALU(int32_t in0, int32_t in1, uint8_t ALUControl, bool* ALUiszero) {
         case 2: result = in0 + in1;
         case 6: result = in0 - in1;
         case 7: result = (in0 < in1) ? 1 : 0;
-        case 12: result = !(in0 | in1);
+        case 12: result = ~(in0 | in1);
     }
 
     *ALUiszero = (result == 0) ? 1 : 0;
@@ -210,17 +220,10 @@ void execute(uint32_t insn) {
 
     // Stage 2 Execute
     // Set all the MUX control gates to their appropriate value based on the decoded opcode 
-    Control(instr.opcode, _RegDst, _ALUSrc, _MemtoReg, _RegWrite, _MemRead, _MemWrite, _Branch, _ALUOp);
+    Control(instr.opcode, &_RegDst, &_ALUSrc, &_MemtoReg, &_RegWrite, &_MemRead, &_MemWrite, &_Branch, &_ALUOp);
     // Set the ALU Control Signal to the appropriate signal based on the ALUOp and the Instruction Function
     _ALUCtrl = ALUControl(_ALUOp, instr.funct);
 
-    // Stage 2.5 Branch
-    if ((instr.opcode == 2 || instr.opcode == 3) && _Branch == 1) {
-        int32_t temp = instr.address << 2;
-        int32_t u = (_PC >> (32 - 4)) << 32 - 4;
-        temp = temp | u;
-        _PC += temp;
-    }
 
     // Setting the correct outputs of the file register
     int32_t* RD1;
@@ -231,11 +234,11 @@ void execute(uint32_t insn) {
     // Read Register - Note that WD is not written yet, we will write it later
     // once the value of WD has been determined - still impt because this step
     // writes the values of RD1 and RD2, which are inputs for the ALU
-    RegFile(instr.rs, instr.rd, WR, WD, RD1, RD2, _RegWrite);
+    RegFile(instr.rs, instr.rd, WR, WD, &RD1, &RD2, _RegWrite);
 
     // Configuring ALU with the correct signals
     bool* _ALUisZero;
-    int32_t ALUResult = ALU(RD1, RD2, _ALUCtrl, _ALUisZero);
+    int32_t ALUResult = ALU(RD1, RD2, _ALUCtrl, &_ALUisZero);
 
 
     // Stage 3 Memory
@@ -243,7 +246,11 @@ void execute(uint32_t insn) {
 
 
     // Stage 4 WriteBack
-    RegFile(instr.rs, instr.rd, WR, MemOutput, RD1, RD2, _RegWrite);
+    RegFile(instr.rs, instr.rd, WR, mux_u32(_MemtoReg, ALUResult, MemOutput), &RD1, &RD2, _RegWrite);
+
+
+    // Stage 5 Branch if BEQ
+    _PC = mux_u32(_ALUisZero == 1 && _Branch == 1, _PC, _PC + instr.immed << 2);
 }
 
 #endif  // End of Assignment 2, Question 3
