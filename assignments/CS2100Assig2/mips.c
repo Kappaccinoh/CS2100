@@ -130,6 +130,7 @@ void Control(uint8_t opcode, bool* _RegDst, bool* _ALUSrc, bool* _MemtoReg,
             *_ALUOp = 1;
             break;
         default:
+            break;
     }
 
     if (opcode == 4) *_Branch = 1;
@@ -214,23 +215,23 @@ void execute(uint32_t insn) {
     // Read Register - Note that WD is not written yet, we will write it later
     // once the value of WD has been determined - still impt because this step
     // writes the values of RD1 and RD2, which are inputs for the ALU
-    RegFile(instr.rs, instr.rd, WR, WD, &RD1, &RD2, _RegWrite);
+    RegFile(instr.rs, instr.rd, WR, WD, RD1, RD2, _RegWrite);
 
     // Configuring ALU with the correct signals
     bool* _ALUisZero;
-    int32_t ALUResult = ALU(RD1, RD2, _ALUCtrl, &_ALUisZero);
+    int32_t ALUResult = ALU(*RD1, *RD2, _ALUCtrl, _ALUisZero);
 
 
     // Stage 3 Memory
-    int32_t MemOutput = Memory(ALUResult, RD2, _MemRead, _MemWrite);
+    int32_t MemOutput = Memory(ALUResult, *RD2, _MemRead, _MemWrite);
 
 
     // Stage 4 WriteBack
-    RegFile(instr.rs, instr.rd, WR, mux_u32(_MemtoReg, ALUResult, MemOutput), &RD1, &RD2, _RegWrite);
+    RegFile(instr.rs, instr.rd, WR, mux_u32(_MemtoReg, ALUResult, MemOutput), RD1, RD2, _RegWrite);
 
 
     // Stage 5 Branch if BEQ
-    _PC = mux_u32(_ALUisZero == 1 && _Branch == 1, _PC, _PC + instr.immed << 2);
+    _PC = mux_u32(*_ALUisZero == 1 && _Branch == 1, _PC, (_PC + (instr.immed << 2)));
 }
 
 #endif  // End of Assignment 2, Question 3
