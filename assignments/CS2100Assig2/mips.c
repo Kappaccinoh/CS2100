@@ -154,7 +154,7 @@ uint8_t ALUControl(uint8_t ALUOp, uint8_t funct) {
                 return 12;
             case 37:
                 return 1;
-            case 42:
+            default: // case 42:
                 return 7;
         }
     } else if (ALUOp == 1) { // BEQ Instruction
