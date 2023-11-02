@@ -3,6 +3,8 @@ F = 1
 _ = 0
 
 Format of letters is in [X3,X2,X1,X0,Y3,Y2,Y1,Y0]
+Comparator is X < Y
+
 A B A A A A C D
 A B A A A A D C
 A B A B A A C D
